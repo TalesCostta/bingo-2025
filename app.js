@@ -22,6 +22,7 @@
   const hostResult = document.getElementById('hostResult');
   const hostLink = document.getElementById('hostLink');
   const copyLinkBtn = document.getElementById('copyLink');
+  const qrArea = document.getElementById('qrArea');
 
   const STORAGE_KEY = 'bingo2025_state';
   const FREE_INDEX = 12;
@@ -319,14 +320,18 @@
       const link = `${buildBaseUrl()}?${params.toString()}`;
       hostLink.value = link;
       hostResult.hidden = false;
-      if (window.QRious) {
-        new QRious({
-          element: document.getElementById('qrCanvas'),
-          value: link,
-          size: 180,
-          foreground: '#18d8a2',
-          background: '#0b1221',
+      if (qrArea) {
+        qrArea.innerHTML = '';
+        const img = new Image();
+        img.width = 180;
+        img.height = 180;
+        img.alt = 'QR do evento';
+        img.src = `https://quickchart.io/qr?text=${encodeURIComponent(link)}&size=180&light=%230b1221&dark=%2318d8a2&margin=2`;
+        img.addEventListener('error', () => {
+          qrArea.textContent = 'QR indisponível. Copie o link acima.';
+          qrArea.style.color = '#ff8b8b';
         });
+        qrArea.appendChild(img);
       }
     });
 

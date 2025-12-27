@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Bingo Seguro</title>
+  <title>Bingo da Família</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -62,14 +62,13 @@
             <input type="text" id="hostLink" readonly>
             <button id="copyLink" class="ghost small">Copiar</button>
           </div>
-          <canvas id="qrCanvas" width="180" height="180"></canvas>
+          <div id="qrArea" class="qr-box"></div>
           <p class="hint">Compartilhe o link ou imprima o QR para os participantes.</p>
         </div>
       </section>
     </main>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js" integrity="sha384-u64gC8F0LFEKqv3S6x3qsTgkACWFx6o5+t2QV5XJNsAt2hYQYxv2p+SdxWny6JSc" crossorigin="anonymous"></script>
   <script src="app.js"></script>
 </body>
 </html>
