@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Bingo Seguro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="event-info">
+        <div class="label">Evento</div>
+        <div id="eventName" class="value">—</div>
+      </div>
+      <div class="event-info">
+        <div class="label">Cartela</div>
+        <div id="cardId" class="value">—</div>
+      </div>
+      <button id="copyId" class="ghost small">Copiar ID</button>
+    </header>
+
+    <main id="participantView" class="screen">
+      <section class="notice" id="missingEventNotice" hidden>
+        <p>Defina um evento via <code>?event=SEED</code> ou insira abaixo.</p>
+        <div class="inline-form">
+          <input type="text" id="manualEvent" placeholder="SEED do evento">
+          <button id="applyEvent">Usar</button>
+        </div>
+      </section>
+
+      <section class="controls">
+        <div class="pill-group">
+          <button id="checkBingo" class="pill strong">Verificar bingo</button>
+        </div>
+        <div class="status-row">
+          <span id="markCount">Marcados: 0/25</span>
+          <span id="lockState" class="badge" hidden>Desbloqueado</span>
+        </div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+      </section>
+
+      <section id="boardArea">
+        <div class="board-header">
+          <span>B</span><span>I</span><span>N</span><span>G</span><span>O</span>
+        </div>
+        <div id="board" class="board" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <main id="hostView" class="screen" hidden>
+      <section class="card">
+        <h1>Gerador do evento</h1>
+        <label class="field">
+          <span>Seed do evento</span>
+          <input type="text" id="hostEventSeed" placeholder="Ex.: NATAL2025">
+        </label>
+        <button id="hostGenerate" class="primary">Gerar link do evento</button>
+        <div class="result" id="hostResult" hidden>
+          <p>Link pronto:</p>
+          <div class="inline-form">
+            <input type="text" id="hostLink" readonly>
+            <button id="copyLink" class="ghost small">Copiar</button>
+          </div>
+          <canvas id="qrCanvas" width="180" height="180"></canvas>
+          <p class="hint">Compartilhe o link ou imprima o QR para os participantes.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js" integrity="sha384-u64gC8F0LFEKqv3S6x3qsTgkACWFx6o5+t2QV5XJNsAt2hYQYxv2p+SdxWny6JSc" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>
