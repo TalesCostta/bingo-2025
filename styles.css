@@ -160,6 +160,12 @@ button:disabled {
   font-size: 14px;
 }
 
+.feedback.celebrate {
+  color: #ffe082;
+  font-weight: 700;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
 .badge {
   padding: 6px 10px;
   border-radius: 999px;
@@ -290,6 +296,29 @@ input:focus,
 .primary:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 12;
+}
+
+.confetto {
+  position: absolute;
+  width: 8px;
+  height: 14px;
+  border-radius: 3px;
+  opacity: 0.9;
+  animation: confetti 1200ms ease-out forwards;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+}
+
+@keyframes confetti {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(320deg); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

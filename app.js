@@ -23,6 +23,8 @@
   const hostLink = document.getElementById('hostLink');
   const copyLinkBtn = document.getElementById('copyLink');
   const qrArea = document.getElementById('qrArea');
+  const confettiEl = document.getElementById('confetti');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const STORAGE_KEY = 'bingo2025_state';
   const FREE_INDEX = 12;
@@ -33,8 +35,9 @@
     if (checkBingoBtn) checkBingoBtn.disabled = !enabled;
   };
 
-  const showFeedback = (msg) => {
+  const showFeedback = (msg, celebrate = false) => {
     feedbackEl.textContent = msg || '';
+    feedbackEl.classList.toggle('celebrate', celebrate);
   };
 
   const loadStore = () => {
@@ -222,18 +225,30 @@
     renderBoard();
   };
 
-  const hasBingo = () => {
+  // Detecta bingo por linha, coluna ou cartela cheia
+  const detectBingo = () => {
     const m = state.marks;
-    const lines = [];
-    for (let r = 0; r < 5; r++) lines.push([0,1,2,3,4].map(c => r*5+c));
-    for (let c = 0; c < 5; c++) lines.push([0,1,2,3,4].map(r => r*5+c));
-    lines.push([0,6,12,18,24], [4,8,12,16,20]);
-    return lines.some(line => line.every(i => m[i]));
+    const allMarked = m.every(Boolean);
+    if (allMarked) return 'Cartela cheia';
+    for (let r = 0; r < 5; r++) {
+      const row = [0,1,2,3,4].map(c => r*5 + c);
+      if (row.every(i => m[i])) return 'Linha completa';
+    }
+    for (let c = 0; c < 5; c++) {
+      const col = [0,1,2,3,4].map(r => r*5 + c);
+      if (col.every(i => m[i])) return 'Coluna completa';
+    }
+    return null;
   };
 
   const checkBingo = () => {
-    const bingo = hasBingo();
-    showFeedback(bingo ? 'BINGO! Linha completa.' : 'Ainda não rolou bingo.');
+    const result = detectBingo();
+    if (result) {
+      showFeedback(`BINGO! ${result}.`, true);
+      launchConfetti();
+    } else {
+      showFeedback('Ainda não rolou bingo.');
+    }
   };
 
   const rebuildBoard = () => {
@@ -274,6 +289,7 @@
       url.searchParams.set('event', value);
       window.location.href = url.toString();
     });
+
   };
 
   const initParticipant = () => {
@@ -303,6 +319,26 @@
   const buildBaseUrl = () => {
     const path = window.location.pathname.replace(/index\\.html$/, '');
     return `${window.location.origin}${path}`;
+  };
+
+  // Confete leve para celebrar bingo sem bloquear a tela
+  const confettiColors = ['#ffda67', '#18d8a2', '#8b5cf6', '#38bdf8', '#f472b6'];
+  const launchConfetti = () => {
+    if (prefersReducedMotion || !confettiEl) return;
+    for (let i = 0; i < 28; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetto';
+      const startX = Math.random() * 100;
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 80 + Math.random() * 80;
+      piece.style.left = `${startX}%`;
+      piece.style.top = `${Math.random() * 20 + 10}%`;
+      piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      piece.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+      piece.style.setProperty('--dy', `${Math.sin(angle) * distance + 120}px`);
+      piece.addEventListener('animationend', () => piece.remove());
+      confettiEl.appendChild(piece);
+    }
   };
 
   const initHost = () => {
