@@ -28,6 +28,7 @@
 
   const STORAGE_KEY = 'bingo2025_state';
   const FREE_INDEX = 12;
+  const MAX_NUMBER = 90;
   let state = null;
   let activeEvent = '';
 
@@ -114,15 +115,19 @@
     return pool.slice(0, count);
   };
 
+  // Divide o range total em 5 colunas equilibradas (1-18, 19-36, ... 73-90)
+  const createRanges = () => {
+    const span = Math.ceil(MAX_NUMBER / 5);
+    return Array.from({ length: 5 }, (_, col) => {
+      const start = col * span + 1;
+      const end = Math.min(MAX_NUMBER, (col + 1) * span);
+      return { start, end };
+    });
+  };
+
   const generateBoard = (seed, freeEnabled) => {
     const rng = createRng(seed);
-    const ranges = [
-      { start: 1, end: 15 },
-      { start: 16, end: 30 },
-      { start: 31, end: 45 },
-      { start: 46, end: 60 },
-      { start: 61, end: 75 },
-    ];
+    const ranges = createRanges();
     const board = Array(25).fill(null);
     ranges.forEach((range, col) => {
       const need = freeEnabled && col === 2 ? 4 : 5;
