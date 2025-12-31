@@ -2,7 +2,6 @@
   const qs = new URLSearchParams(window.location.search);
   const isHost = qs.get('host') === '1';
   const urlEvent = (qs.get('event') || '').trim();
-  const urlFree = '1'; // free sempre ativo para participantes
 
   const participantView = document.getElementById('participantView');
   const hostView = document.getElementById('hostView');
@@ -28,6 +27,7 @@
 
   const STORAGE_KEY = 'bingo2025_state';
   const FREE_INDEX = 12;
+  const DEFAULT_FREE_ENABLED = false;
   const MAX_NUMBER = 90;
   let state = null;
   let activeEvent = '';
@@ -135,11 +135,7 @@
       let cursor = 0;
       for (let row = 0; row < 5; row++) {
         const idx = row * 5 + col;
-        if (freeEnabled && idx === FREE_INDEX) {
-          board[idx] = 'FREE';
-        } else {
-          board[idx] = numbers[cursor++];
-        }
+        board[idx] = numbers[cursor++];
       }
     });
     return board;
@@ -154,12 +150,13 @@
   const loadStateForEvent = (eventSeed) => {
     const store = loadStore();
     const stored = store.events[eventSeed];
-    const freeEnabled = true;
+    const freeEnabled = DEFAULT_FREE_ENABLED;
     if (stored) {
       const needsNewBoard = stored.freeEnabled !== freeEnabled || !stored.board;
       const board = needsNewBoard ? generateBoard(eventSeed + stored.playerId + (freeEnabled ? 'free' : 'nofree'), freeEnabled) : stored.board;
-      const marks = Array.isArray(stored.marks) ? stored.marks.slice(0, 25).concat(Array(25).fill(false)).slice(0, 25) : initMarks(freeEnabled);
-      if (freeEnabled) marks[FREE_INDEX] = true;
+      const marks = needsNewBoard
+        ? initMarks(freeEnabled)
+        : (Array.isArray(stored.marks) ? stored.marks.slice(0, 25).concat(Array(25).fill(false)).slice(0, 25) : initMarks(freeEnabled));
       return {
         ...stored,
         freeEnabled,
@@ -189,9 +186,8 @@
       const cell = document.createElement('div');
       cell.className = 'cell';
       cell.dataset.index = index;
-      cell.textContent = value === 'FREE' ? 'Feliz 2026' : value;
+      cell.textContent = value;
       if (state.marks[index]) cell.classList.add('marked');
-      if (value === 'FREE') cell.classList.add('free');
       cell.setAttribute('role', 'button');
       cell.setAttribute('aria-pressed', state.marks[index]);
       boardEl.appendChild(cell);
@@ -217,13 +213,6 @@
   };
 
   const toggleMark = (idx) => {
-    if (state.freeEnabled && idx === FREE_INDEX) {
-      state.marks[FREE_INDEX] = true;
-      saveState();
-      updateMarkCount();
-      renderBoard();
-      return;
-    }
     state.marks[idx] = !state.marks[idx];
     updateMarkCount();
     saveState();
@@ -357,7 +346,7 @@
         hostResult.hidden = true;
         return;
       }
-      const params = new URLSearchParams({ event: seed, free: '1' });
+      const params = new URLSearchParams({ event: seed });
       const link = `${buildBaseUrl()}?${params.toString()}`;
       hostLink.value = link;
       hostResult.hidden = false;
